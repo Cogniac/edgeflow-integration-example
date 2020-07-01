@@ -33,17 +33,19 @@ def configure_subjects(input_subjects, output_subjects):
 
 
 
-def process_input(subject_associations,
+def process_input(input_subject_association,
+                  other_subject_associations,
                   media_bytes=None,
                   domain_unit=None):
-
     """
-    Integration handler: called for each input subject association:
+    Integration handler: called for each input to this application.
 
-    subject_associations(list):  List of dictionaries for each upstream subject association.
-                                 The most recent input association (e.g. containing this app's subject_uid)
-                                 will be found at the end of the list.
-                                 The subject association contents are as follows:
+    input_subject_association(dict):   The immediate subject association input to this app
+    other_subject_associations(list):  List of dictionaries for preceeding (upstream) subject associations
+
+    For both input subject association and previous_subject_associations,  the subject association
+    dictionary contents are as follows:
+
         subject_uid (string):    The subject_uid for this association.
         focus (dict):            Focus dictionary if any
         probability (float):     The probability of the subject-media association.
@@ -65,5 +67,6 @@ def process_input(subject_associations,
     The output domain_unit must be None if an input domain_unit was not None. E.g. a domain unit can only
     be specified if there is no preceeding domain unit.
     """
-    print "process_input", subject_associations, domain_unit
+    print "process_input", input_subject_association, domain_unit
     return ([], None, None)
+

@@ -9,3 +9,6 @@ Reference for Cogniac EdgeFlow integration app
 5. run ./PUSH to push integration.py and requirements.txt to Cogniac Core, build, and deploy
 
 TODO: environment variables and secrets (currently requires edits to PUSH)
+
+
+Note: this will likely become a public repo so please treat it as such 

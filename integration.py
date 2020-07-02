@@ -2,9 +2,11 @@
 Integration Reference Code
 
 For use in Cogniac "Integration" application type
-
-Integration applications should use this code as starting point for integration.
 """
+import arrow
+
+
+print "Hello World", arrow.utcnow()
 
 
 def configure_subjects(input_subjects, output_subjects):
@@ -28,7 +30,6 @@ def configure_subjects(input_subjects, output_subjects):
         print "Ouput Subjects:"
     for i in output_subjects:
         print "\t", i
-
 
 
 def process_input(input_subject_association,

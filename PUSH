@@ -1,0 +1,86 @@
+#!/usr/bin/env python
+"""
+example code for setting integration src_code, environment, secrets via public_api
+
+Copyright (C) 2020 Cogniac Corporation
+"""
+import cogniac
+import os
+import sys
+
+if "APP_ID" not in os.environ:
+    print "Set APP_ID environment variable"
+    sys.exit(1)
+    
+APP_ID = os.environ['APP_ID']
+
+ENV = []
+SECRETS = []
+
+env = [{'name': k, 'value': v} for k, v in ENV]
+secrets = [{'name': k, 'value': v} for k, v in SECRETS]
+
+
+src_fn = "integration.py"
+
+print "Pushing %s to app_id %s" % (src_fn, APP_ID)
+
+# read requirements.txt 
+try:
+    requirements = open('requirements.txt').read().split('\n')
+except:
+    requirements = None
+
+
+src_config = {'environment': env,
+              'secrets': secrets,
+              'requirements': requirements,
+              'src_code': open(src_fn).read()}
+
+
+cc = cogniac.CogniacConnection()
+
+app = cc.get_application(APP_ID)
+
+# get old build status for comparison
+old_build_status = app.app_type_status['build_status']
+old_deploy_status = app.app_type_status['deploy_status']
+
+app.app_type_config = src_config
+
+if not app.active:
+    app.active = True
+
+from time import sleep
+
+print "\nBuild Status:"
+
+while True:
+    app = cc.get_application(APP_ID)
+    build_status = app.app_type_status['build_status']
+    if build_status != old_build_status:
+        if build_status['status'] == "build in progress":
+            print "."
+            sleep(0.33)
+            continue
+        break
+
+print build_status['status']
+print "Src Code SHA256:", build_status['sha256']
+print build_status.get('image')
+print
+
+
+print "Deploy Status:"
+while True:
+    app = cc.get_application(APP_ID)
+    deploy_status = app.app_type_status['deploy_status']
+    if deploy_status != old_deploy_status:
+        if deploy_status['status'] == "deploy in progress":
+            print "."
+            sleep(0.33)
+            continue
+        break
+
+print deploy_status['status']
+print deploy_status.get('image')

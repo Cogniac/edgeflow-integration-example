@@ -7,6 +7,9 @@ Copyright (C) 2020 Cogniac Corporation
 import cogniac
 import os
 import sys
+from time import time
+
+t0 = time()
 
 if "APP_ID" not in os.environ:
     print "Set APP_ID environment variable"
@@ -84,3 +87,5 @@ while True:
 
 print deploy_status['status']
 print deploy_status.get('image')
+
+print "\nElapsed time: %.1f seconds" % (time() - t0)

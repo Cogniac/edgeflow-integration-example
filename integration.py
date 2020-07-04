@@ -2,11 +2,16 @@
 Integration Reference Code
 
 For use in Cogniac "Integration" application type
+
 """
 import arrow
 
 
 print "Hello World", arrow.utcnow()
+
+
+INPUT_SUBJECTS = None
+OUTPUT_SUBJECTS = None
 
 
 def configure_subjects(input_subjects, output_subjects):
@@ -22,6 +27,8 @@ def configure_subjects(input_subjects, output_subjects):
       name (string):           The name of the subject
       external_id(string):     The subject external_id
     """
+    global INPUT_SUBJECTS
+    global OUTPUT_SUBJECTS
     if input_subjects:
         print "Input Subjects:"
     for i in input_subjects:
@@ -30,6 +37,8 @@ def configure_subjects(input_subjects, output_subjects):
         print "Ouput Subjects:"
     for i in output_subjects:
         print "\t", i
+    INPUT_SUBJECTS = input_subjects
+    OUTPUT_SUBJECTS = output_subjects
 
 
 def process_input(input_subject_association,
@@ -67,4 +76,18 @@ def process_input(input_subject_association,
     be specified if there is no preceeding domain unit.
     """
     print "process_input", input_subject_association, domain_unit
-    return ([], None, None)
+
+    if not OUTPUT_SUBJECTS:
+        return ([], None, None)
+
+    subject_uid = OUTPUT_SUBJECTS[0]
+    data = str({'foo': 'baz'})
+    
+    output_association = {'subject_uid': subject_uid,
+                          'focus': None,
+                          'probability': 1,
+                          'app_data_type': 'custom',
+                          'app_data': data}
+
+    return [output_association], None, None
+

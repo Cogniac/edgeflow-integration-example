@@ -73,7 +73,9 @@ print "Src Code SHA256:", build_status['sha256']
 print build_status.get('image')
 print
 
-
+if build_status['status'] != "Build Complete":
+    sys.exit(1)
+    
 print "Deploy Status:"
 while True:
     app = cc.get_application(APP_ID)

@@ -46,9 +46,11 @@ print "\nElapsed time: %.1f seconds" % (time() - t0)
 print
 
 
-
 """
-url = "/builds?name=foo-bar&limit=17"
+cc._get("/builds/%s" % build['build_id'])
+cc._delete("/builds/%s" % build['build_id'])
+
+url = "/builds?name=foo-bar&limit=17&reverse=True"
 while True:
     res = cc._get(url).json()
     for i in res['data']:

@@ -7,6 +7,7 @@ Copyright (C) 2020 Cogniac Corporation
 import cogniac
 import sys
 from time import time
+import os
 
 t0 = time()
 
@@ -17,8 +18,9 @@ except:
     requirements = None
 
 src_fn = "integration.py"
+name = src_fn.split('.')[0].lower()
 
-src_config = {'name': 'foo-bar',
+src_config = {'name': name,
               'description': 'test code',
               'requirements': requirements,
               'src_code': open(src_fn).read()}
@@ -26,9 +28,6 @@ src_config = {'name': 'foo-bar',
 
 cc = cogniac.CogniacConnection()
 
-
-#res = cc._get('/builds/version')
-#print res.content
 
 try:
     res = cc._post("/builds", json=src_config)
@@ -40,13 +39,63 @@ except cogniac.ServerError as e:
     sys.exit(2)
 
 build = res.json()
-print build['image']
+image = build['image']
+print image
 
-print "\nElapsed time: %.1f seconds" % (time() - t0)
+print "\nElapsed Build time: %.1f seconds" % (time() - t0)
 print
 
 
+print "Deploy", image
+
+if "APP_ID" not in os.environ:
+    print "Set APP_ID environment variable"
+    sys.exit(1)
+    
+APP_ID = os.environ['APP_ID']
+
+app = cc.get_application(APP_ID)
+
+
+old_deploy_status = app.app_type_status.get('deploy_status', {})
+                                        
+
+ENV = [('FOO', 'BAR')]
+SECRETS = []
+
+env = [{'name': k, 'value': v} for k, v in ENV]
+secrets = [{'name': k, 'value': v} for k, v in SECRETS]
+
+deploy_config = {'environment': env,
+                 'secrets': secrets,
+                 'image': image}
+
+app.app_type_config = deploy_config
+
+print '------------------------'
+from pprint import pprint
+app = cc.get_application(APP_ID)
+pprint(app.app_type_config)
+print '------------------------'
+
+while True:
+    app = cc.get_application(APP_ID)
+    deploy_status = app.app_type_status.get('deploy_status', {})
+    if deploy_status and deploy_status != old_deploy_status:
+        if deploy_status.get('status') == "deploy in progress":
+            print "."
+            continue
+        break
+
+print "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+pprint(app.app_type_status)
+print
+
+    
 """
+print cc._get('/builds/version').content
+
 cc._get("/builds/%s" % build['build_id'])
 cc._delete("/builds/%s" % build['build_id'])
 
@@ -60,4 +109,12 @@ while True:
         print url
     else:
         break
+
+res = cc._get("/builds?name=foo-bar&limit=1&reverse=True").json()['data'][0]
+print res['name'], res['version'], res['image']
+
+print cc._get("/builds/names").json()
 """
+
+
+

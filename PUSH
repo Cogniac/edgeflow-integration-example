@@ -5,89 +5,103 @@ example code for setting integration src_code, environment, secrets via public_a
 Copyright (C) 2020 Cogniac Corporation
 """
 import cogniac
-import os
 import sys
 from time import time
+import os
 
 t0 = time()
 
-if "APP_ID" not in os.environ:
-    print "Set APP_ID environment variable"
-    sys.exit(1)
-    
-APP_ID = os.environ['APP_ID']
-
-ENV = []
-SECRETS = []
-
-env = [{'name': k, 'value': v} for k, v in ENV]
-secrets = [{'name': k, 'value': v} for k, v in SECRETS]
+##
+#  Create Build
+##
 
 
-src_fn = "integration.py"
-
-print "Pushing %s to app_id %s" % (src_fn, APP_ID)
-
-# read requirements.txt 
+# read requirements.txt
 try:
-    requirements = open('requirements.txt').read().split('\n')
+    requirements = open('requirements.txt').read()
 except:
     requirements = None
+    
+src_fn = "integration.py"
+name = src_fn.split('.')[0].lower()
 
-
-src_config = {'environment': env,
-              'secrets': secrets,
+src_config = {'name': name,
+              'description': 'test code',
               'requirements': requirements,
               'src_code': open(src_fn).read()}
 
 
 cc = cogniac.CogniacConnection()
 
-app = cc.get_application(APP_ID)
+print "Building", src_fn
 
-# get old build status for comparison
-old_build_status = app.app_type_status['build_status']
-old_deploy_status = app.app_type_status['deploy_status']
+try:
+    res = cc._post("/builds", json=src_config)
+except cogniac.ClientError as e:
+    print e.message
+    sys.exit(1)
+except cogniac.ServerError as e:
+    print e.message
+    sys.exit(2)
 
-app.app_type_config = src_config
+build = res.json()
+image = build['image']
+print image
 
-if not app.active:
-    app.active = True
-
-from time import sleep
-
-print "\nBuild Status:"
-
-while True:
-    app = cc.get_application(APP_ID)
-    build_status = app.app_type_status['build_status']
-    if build_status != old_build_status:
-        if build_status['status'] == "build in progress":
-            print "."
-            sleep(0.33)
-            continue
-        break
-
-print build_status['status']
-print "Src Code SHA256:", build_status['sha256']
-print build_status.get('image')
+print "\nElapsed Build time: %.1f seconds" % (time() - t0)
 print
 
-if build_status['status'] != "Build Complete":
+
+##
+# Create Deployment from build
+##
+
+print "Deploy", image
+
+if "APP_ID" not in os.environ:
+    print "Set APP_ID environment variable"
     sys.exit(1)
-    
-print "Deploy Status:"
+
+APP_ID = os.environ['APP_ID']
+
+app = cc.get_application(APP_ID)
+
+# get current deployment so we can report when it has changed
+old_deploy_status = app.app_type_status
+                                       
+ENV = [('FOO', 'BAR')]
+SECRETS = []       # Note: recommend to set these here from specific environment variables
+
+env = [{'name': k, 'value': v} for k, v in ENV]
+secrets = [{'name': k, 'value': v} for k, v in SECRETS]
+
+deploy_config = {'environment': env,
+                 'secrets': secrets,
+                 'image': image}
+
+app.app_type_config = deploy_config
+
+print '------------------------'
+print "Deployment Config:"
+from pprint import pprint
+app = cc.get_application(APP_ID)
+pprint(app.app_type_config)
+print
+
+
+# wait for deploy status to change and complete
+
 while True:
     app = cc.get_application(APP_ID)
-    deploy_status = app.app_type_status['deploy_status']
-    if deploy_status != old_deploy_status:
-        if deploy_status['status'] == "deploy in progress":
+    deploy_status = app.app_type_status
+    if deploy_status and deploy_status != old_deploy_status:
+        if deploy_status.get('status') == "deploy in progress":
             print "."
-            sleep(0.33)
             continue
         break
 
-print deploy_status['status']
-print deploy_status.get('image')
+print '------------------------'
+print "Deployment Status:"
+pprint(app.app_type_status)
+print
 
-print "\nElapsed time: %.1f seconds" % (time() - t0)

@@ -44,7 +44,8 @@ def configure_subjects(input_subjects, output_subjects):
 def process_input(input_subject_association,
                   other_subject_associations,
                   media_bytes=None,
-                  domain_unit=None):
+                  domain_unit=None,
+                  domain_metadata=None):
     """
     Integration handler: called for each input to this application.
 

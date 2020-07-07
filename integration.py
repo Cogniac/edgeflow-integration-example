@@ -31,12 +31,12 @@ def configure_subjects(input_subjects, output_subjects):
     global OUTPUT_SUBJECTS
     if input_subjects:
         print "Input Subjects:"
-    for i in input_subjects:
-        print "\t", i
+        for i in input_subjects:
+            print "\t", i
     if output_subjects:
         print "Ouput Subjects:"
-    for i in output_subjects:
-        print "\t", i
+        for i in output_subjects:
+            print "\t", i
     INPUT_SUBJECTS = input_subjects
     OUTPUT_SUBJECTS = output_subjects
 

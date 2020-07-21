@@ -10,35 +10,41 @@ import arrow
 print "Hello World", arrow.utcnow()
 
 
-INPUT_SUBJECTS = None
-OUTPUT_SUBJECTS = None
+APP_INPUT_SUBJECT_UIDS = None
+APP_OUTPUT_SUBJECT_UIDS = None
+TENANT_SUBJECT_CONFIG = None
 
 
-def configure_subjects(input_subjects, output_subjects):
+def configure_subjects(input_subject_uids, output_subject_uids, tenant_subject_config):
     """
     configure the integration app subjects.  This is called once at startup.
     If application configuration changes this module will terminate and be reloaded.
 
-    input_subjects:   list of input subject dictionaries
-    output_subjects:  list of output subject dictionaries
+    input_subjects_uids:   list of input subject_uids
+    output_subject_uids:   list of output subject uids
 
-    contents of the subject dictionaries are as follows:
+    all_subject_config:    list of subject dictionaries of all tenant subject,
+                           contentshe subject dictionaries are as follows:
       subject_uid (string):    The subject_uid of the input or output subject
       name (string):           The name of the subject
-      external_id(string):     The subject external_id
+      external_id(string):     The subject external_id (if any)
+      custom_data(string):     The subject custom_data (if any)
     """
-    global INPUT_SUBJECTS
-    global OUTPUT_SUBJECTS
-    if input_subjects:
+    global APP_INPUT_SUBJECT_UIDS
+    global APP_OUTPUT_SUBJECT_UIDS
+    global TENANT_SUBJECT_CONFIG
+    if input_subject_uids:
         print "Input Subjects:"
-    for i in input_subjects:
+    for i in input_subject_uids:
         print "\t", i
-    if output_subjects:
+    if output_subject_uids:
         print "Ouput Subjects:"
-    for i in output_subjects:
+    for i in output_subject_uids:
         print "\t", i
-    INPUT_SUBJECTS = input_subjects
-    OUTPUT_SUBJECTS = output_subjects
+    APP_INPUT_SUBJECT_UIDS = input_subject_uids
+    APP_OUTPUT_SUBJECT_UIDS = output_subject_uids
+    TENANT_SUBJECT_CONFIG = tenant_subject_config
+
 
 
 def process_input(input_subject_association,
@@ -77,10 +83,10 @@ def process_input(input_subject_association,
     """
     print "process_input", input_subject_association, domain_unit
 
-    if not OUTPUT_SUBJECTS:
+    if not APP_OUTPUT_SUBJECT_UIDS:
         return ([], None, None)
 
-    subject_uid = OUTPUT_SUBJECTS[0]
+    subject_uid = APP_OUTPUT_SUBJECT_UIDS[0]
     data = str({'foo': 'baz'})
     
     output_association = {'subject_uid': subject_uid,
@@ -90,4 +96,3 @@ def process_input(input_subject_association,
                           'app_data': data}
 
     return [output_association], None, None
-

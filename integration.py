@@ -10,50 +10,32 @@ import arrow
 print "Hello World", arrow.utcnow()
 
 
-APP_INPUT_SUBJECT_UIDS = None
-APP_OUTPUT_SUBJECT_UIDS = None
-TENANT_SUBJECT_CONFIG = None
+# import our relevant configuration
 
+from edgeflow import APP_INPUT_SUBJECT_UIDS       # list of this app's input  subject_uids
+from edgeflow import APP_OUTPUT_SUBJECT_UIDS      # list of this app's output subject_uids
+from edgeflow import TENANT_CAMERA_CONFIG         # list of all tenant cameras
+from edgeflow import TENANT_SUBJECT_CONFIG        # list of all tenant subjects
 
-def configure_subjects(input_subject_uids, output_subject_uids, tenant_subject_config):
-    """
-    configure the integration app subjects.  This is called once at startup.
-    If application configuration changes this module will terminate and be reloaded.
+"""
+The individual tenant subject config dictionaries include the following info:
 
-    input_subjects_uids:   list of input subject_uids
-    output_subject_uids:   list of output subject uids
-
-    all_subject_config:    list of subject dictionaries of all tenant subject,
-                           contentshe subject dictionaries are as follows:
       subject_uid (string):    The subject_uid of the input or output subject
       name (string):           The name of the subject
       external_id(string):     The subject external_id (if any)
       custom_data(string):     The subject custom_data (if any)
-    """
-    global APP_INPUT_SUBJECT_UIDS
-    global APP_OUTPUT_SUBJECT_UIDS
-    global TENANT_SUBJECT_CONFIG
-    if input_subject_uids:
-        print "Input Subjects:"
-    for i in input_subject_uids:
-        print "\t", i
-    if output_subject_uids:
-        print "Ouput Subjects:"
-    for i in output_subject_uids:
-        print "\t", i
-    APP_INPUT_SUBJECT_UIDS = input_subject_uids
-    APP_OUTPUT_SUBJECT_UIDS = output_subject_uids
-    TENANT_SUBJECT_CONFIG = tenant_subject_config
+"""
 
 
 
-def process_input(input_subject_association,
-                  other_subject_associations,
-                  media_bytes=None,
-                  domain_unit=None):
+
+def process_input(media,
+                  input_subject_association,
+                  other_subject_associations):
     """
     Integration handler: called for each input to this application.
 
+    media(dict):                       Media dictionary as defined below
     input_subject_association(dict):   The immediate subject association input to this app
     other_subject_associations(list):  List of dictionaries for preceeding (upstream) subject associations
 
@@ -66,22 +48,29 @@ def process_input(input_subject_association,
         app_data_type (string):  The type of the optional app_data, or None
         app_data (object):       The optional app data object, or None
 
-    media_bytes (string):        The actual media bytes. May be None if no media available yet.
-    domain_unit (string):        The "domain unit" association with this media if known.
+    The media dictionary is defined as follows:
+
+        media_bytes (string):        The actual media bytes. May be None if no media available yet.
+        media_type (string):         "image" or "video" (required if media_bytes is present)
+        capture_timestamp (float):   Unix epoch timestamp associate with media capture (optional)
+        domain_unit (string):        The "domain unit" associated with this media (optional)
+        trigger_id (string):         Unique trigger identifier leading to this media or sequence of media (optional)
+        sequence_ix (integer):       Index of this media within a trigger_id sequence (optional)
+        external_media_id (string):  external system identifier associated with this media (optional)
+        custom_data (string):        external system data associated with this media (optional)
+
 
     This function should return a tuple as follows:
 
-    (output_associations, media_bytes, domain_unit)
+    (media, output_associations)
+
+    The output media dictionary should be in the same format as the input media dictionary.
 
     The output_associations is a list of dictionaries of the same format as subject_associations.
     The subject_uid in the output_assocation list is limited to the application's configured output subjects.
-
-    media_bytes should be None unless new media has been created
-
-    The output domain_unit must be None if an input domain_unit was not None. E.g. a domain unit can only
-    be specified if there is no preceeding domain unit.
+    
     """
-    print "process_input", input_subject_association, domain_unit
+    print "process_input", input_subject_association
 
     if not APP_OUTPUT_SUBJECT_UIDS:
         return ([], None, None)
@@ -95,4 +84,4 @@ def process_input(input_subject_association,
                           'app_data_type': 'custom',
                           'app_data': data}
 
-    return [output_association], None, None
+    return media, [output_association]

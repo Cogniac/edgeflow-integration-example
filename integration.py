@@ -62,12 +62,12 @@ def process_input(media,
 
     This function should return a tuple as follows:
 
-    (media, output_associations)
+    (media, [output_associations])
 
     The output media dictionary should be in the same format as the input media dictionary.
 
     The output_associations is a list of dictionaries of the same format as subject_associations.
-    The subject_uid in the output_assocation list is limited to the application's configured output subjects.
+    The subject_uid in each output_assocation must be from the application's configured output subjects.
     
     """
     print "process_input", input_subject_association

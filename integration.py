@@ -66,7 +66,7 @@ def process_input(media,
 
     The output media dictionary should be in the same format as the input media dictionary.
 
-    The output_associations is a list of dictionaries of the same format as subject_associations.
+    The [output_associations] is a list of dictionaries of the same format as subject_associations.
     The subject_uid in each output_assocation must be from the application's configured output subjects.
     
     """

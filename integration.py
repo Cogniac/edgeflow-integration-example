@@ -55,8 +55,10 @@ def process_input(media,
         capture_timestamp (float):   Unix epoch timestamp associate with media capture (optional)
         domain_unit (string):        The "domain unit" associated with this media (optional)
         trigger_id (string):         Unique trigger identifier leading to this media or sequence of media (optional)
+        trigger_timestamp (float):   Unix expoch timestamp associated with the trigger event
         sequence_ix (integer):       Index of this media within a trigger_id sequence (optional)
         external_media_id (string):  external system identifier associated with this media (optional)
+        trigger_timestamp (float):   Unix expoch timestamp associated with the trigger event
         custom_data (string):        external system data associated with this media (optional)
 
 

@@ -4,11 +4,6 @@ Integration Reference Code
 For use in Cogniac "Integration" application type
 
 """
-import arrow
-
-
-print "Hello World", arrow.utcnow()
-
 
 # import our relevant configuration
 

@@ -59,14 +59,14 @@ def show_edgeflows(all_ef):
 
 def app_logs(app):
     """
-    Stream app's logs from an edgeflow via rancher
+    Stream app's logs from a specific edgeflow via rancher
     """
     all_ef = app._cc.get_all_edgeflows()
 
     if len(all_ef) == 1:
         edgeflow = all_ef[0]
     else:
-        # fine which edgeflow to use
+        # find which of multiple edgeflow from which to access logs for the specified app
         if len(sys.argv) != 3:
             show_edgeflows(all_ef)
         edgeflow_id = sys.argv[2]
@@ -79,10 +79,14 @@ def app_logs(app):
             show_edgeflows(all_ef)
 
     assert(edgeflow.gateway_id == edgeflow_id)
-        
+
+    # form canonical edgeflow cluster name based on tenant_id and gateway_id
     CLUSTER_NAME = "ef-%s-%s" % (app._cc.tenant_id, edgeflow.gateway_id)
+
+    # get tenant-specific read-only rancher token
     RANCHER_TOKEN = app._cc.tenant.edgeflow_rancher_user_token
 
+    # extract from rancher api the cluster, project, workload, container and pod objects
     session = requests.session()
     session.headers.update({"Authorization": "Bearer %s" % RANCHER_TOKEN})
 
@@ -94,7 +98,8 @@ def app_logs(app):
     pod = session.get(project['links']['pods'] + "?workloadId=" + workload['id']).json()['data'][0]
     
     print "Showing logs for", cluster['name'], workload['name'], pod['name'], container['name']
-    
+
+    # stream logs via secure websocket proxy
     print
     url = 'wss://api.cogniac.io:5001/k8s/clusters/' + cluster['id'] + '/api/v1/namespaces/default/pods/' + pod['name'] + '/log?container=' + container['name'] + '&tailLines=500&follow=true&timestamps=true&previous=false'
 

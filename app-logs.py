@@ -77,8 +77,7 @@ def app_logs(app):
         if edgeflow.gateway_id != edgeflow_id:
             print "Invalid EdgeFlow", edgeflow_id
             show_edgeflows(all_ef)
-
-    assert(edgeflow.gateway_id == edgeflow_id)
+        assert(edgeflow.gateway_id == edgeflow_id)
 
     # form canonical edgeflow cluster name based on tenant_id and gateway_id
     CLUSTER_NAME = "ef-%s-%s" % (app._cc.tenant_id, edgeflow.gateway_id)

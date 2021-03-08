@@ -11,6 +11,7 @@ from edgeflow import APP_INPUT_SUBJECT_UIDS       # list of this app's input  su
 from edgeflow import APP_OUTPUT_SUBJECT_UIDS      # list of this app's output subject_uids
 from edgeflow import TENANT_CAMERA_CONFIG         # list of all tenant cameras
 from edgeflow import TENANT_SUBJECT_CONFIG        # list of all tenant subjects
+from edgeflow import TENANT_CUSTOM_DATA           # contents of the tenant's custom_data field
 
 """
 The individual tenant subject config dictionaries include the following info:

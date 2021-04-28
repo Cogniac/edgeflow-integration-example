@@ -35,7 +35,7 @@ def process_input(media,
     input_subject_association(dict):   The immediate subject association input to this app
     other_subject_associations(list):  List of dictionaries for preceeding (upstream) subject associations
 
-    For both input subject association and previous_subject_associations,  the subject association
+    For both input_subject_association and other_subject_associations,  the subject association
     dictionary contents are as follows:
 
         subject_uid (string):    The subject_uid for this association.

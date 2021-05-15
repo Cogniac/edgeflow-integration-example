@@ -74,12 +74,12 @@ def process_input(media,
         return {}, []
 
     subject_uid = APP_OUTPUT_SUBJECT_UIDS[0]
-    data = str({'foo': 'baz'})
+    data = {'foo': 'baz'}
     
     output_association = {'subject_uid': subject_uid,
                           'focus': None,
                           'probability': 1,
-                          'app_data_type': 'custom',
+                          'app_data_type': 'raw',
                           'app_data': data}
 
     return media, [output_association]

@@ -71,7 +71,7 @@ def process_input(media,
     print "process_input", input_subject_association
 
     if not APP_OUTPUT_SUBJECT_UIDS:
-        return ([], None, None)
+        return {}, []
 
     subject_uid = APP_OUTPUT_SUBJECT_UIDS[0]
     data = str({'foo': 'baz'})

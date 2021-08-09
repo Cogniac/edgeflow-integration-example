@@ -23,8 +23,6 @@ The individual tenant subject config dictionaries include the following info:
 """
 
 
-
-
 def process_input(media,
                   input_subject_association,
                   other_subject_associations):
@@ -35,7 +33,7 @@ def process_input(media,
     input_subject_association(dict):   The immediate subject association input to this app
     other_subject_associations(list):  List of dictionaries for preceeding (upstream) subject associations
 
-    For both input_subject_association and other_subject_associations,  the subject association
+    For both input_subject_association and other_subject_associations, the subject association
     dictionary contents are as follows:
 
         subject_uid (string):    The subject_uid for this association.
@@ -48,13 +46,12 @@ def process_input(media,
 
         media_bytes (string):        The actual media bytes. May be None if no media available yet.
         media_type (string):         "image" or "video" (required if media_bytes is present)
-        capture_timestamp (float):   Unix epoch timestamp associate with media capture (optional)
+        capture_timestamp (float):   Unix epoch timestamp associated with media capture (optional)
         domain_unit (string):        The "domain unit" associated with this media (optional)
         trigger_id (string):         Unique trigger identifier leading to this media or sequence of media (optional)
         trigger_timestamp (float):   Unix expoch timestamp associated with the trigger event
         sequence_ix (integer):       Index of this media within a trigger_id sequence (optional)
         external_media_id (string):  external system identifier associated with this media (optional)
-        trigger_timestamp (float):   Unix expoch timestamp associated with the trigger event
         custom_data (string):        external system data associated with this media (optional)
 
 
@@ -66,16 +63,16 @@ def process_input(media,
 
     The [output_associations] is a list of dictionaries of the same format as subject_associations.
     The subject_uid in each output_assocation must be from the application's configured output subjects.
-    
+
     """
-    print "process_input", input_subject_association
+    print("process_input: {}".format(input_subject_association))
 
     if not APP_OUTPUT_SUBJECT_UIDS:
         return {}, []
 
     subject_uid = APP_OUTPUT_SUBJECT_UIDS[0]
     data = {'foo': 'baz'}
-    
+
     output_association = {'subject_uid': subject_uid,
                           'focus': None,
                           'probability': 1,
